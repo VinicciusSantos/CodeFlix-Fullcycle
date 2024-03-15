@@ -1,4 +1,4 @@
-import { CategorySearchParams, CategorySearchResult, ICategoryRepository } from "../../../domain/ICategoryRepository";
+import { CategorySearchParams, CategorySearchResult, ICategoryRepository } from "../../../domain/category.repository";
 import { Category } from "../../../domain/category.entity";
 import { Op, Promise } from "sequelize";
 import { Uuid } from "../../../../shared/domain/value-objects/uuid.vo";

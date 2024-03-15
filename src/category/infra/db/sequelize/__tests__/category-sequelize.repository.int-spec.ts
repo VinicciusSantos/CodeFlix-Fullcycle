@@ -1,10 +1,9 @@
-import { Sequelize } from "sequelize-typescript";
 import { CategoryModel } from "../category.model";
 import { CategorySequelizeRepository } from "../category-sequelize.repository";
 import { Category } from "../../../../domain/category.entity";
 import { Uuid } from "../../../../../shared/domain/value-objects/uuid.vo";
 import { NotFoundError } from "../../../../../shared/domain/errors/not-found.error";
-import { CategorySearchParams, CategorySearchResult } from "../../../../domain/ICategoryRepository";
+import { CategorySearchParams, CategorySearchResult } from "../../../../domain/category.repository";
 import { CategoryModelMapper } from "../category-model-mapper";
 import { setupSequelize } from "../../../../../shared/infra/testing/helpers";
 
