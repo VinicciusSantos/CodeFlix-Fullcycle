@@ -35,7 +35,7 @@ describe('CategorySequelizeRepository Integration Test', () => {
     expect(entity.toJSON()).toStrictEqual(entityFound!.toJSON());
   });
 
-  it('should return all categories', async () => {
+  it('should return all categories-module', async () => {
     const entity = Category.fake().aCategory().build();
     await repository.insert(entity);
     const entities = await repository.findAll();

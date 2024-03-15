@@ -231,7 +231,7 @@ describe('CategoryFakerBuilder Unit Tests', () => {
     expect(category.created_at).toBe(created_at);
   });
 
-  test('should create many categories', () => {
+  test('should create many categories-module', () => {
     const faker = CategoryFakeBuilder.theCategories(2);
     let categories = faker.build();
 
