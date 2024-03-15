@@ -1,6 +1,5 @@
 import { Uuid } from "../../shared/domain/value-objects/uuid.vo";
 import { CategoryValidatorFactory } from "./category.validator";
-import { EntityValidationError } from "../../shared/domain/validators/validation.error";
 import { Entity } from "../../shared/domain/entity";
 import { ValueObject } from "../../shared/domain/value-object";
 import { CategoryFakeBuilder } from "./category-fake.builder";
@@ -19,7 +18,8 @@ export interface CategoryCreateCommand {
   is_active?: boolean;
 }
 
-export class Category extends Entity {
+export class Category
+  extends Entity {
   public readonly category_id: Uuid;
   public name: string;
   public description: string | null;
@@ -41,18 +41,17 @@ export class Category extends Entity {
 
   public static create(props: CategoryCreateCommand): Category {
     const category = new Category(props);
-    Category.validate(category);
+    category.validate(["name"]);
     return category;
   }
 
   public changeName(name: string): void {
     this.name = name;
-    Category.validate(this);
+    this.validate(["name"]);
   }
 
   public changeDescription(description: string): void {
     this.description = description;
-    Category.validate(this);
   }
 
   public activate(): void {
@@ -64,14 +63,12 @@ export class Category extends Entity {
   }
 
   public static fake() {
-    return CategoryFakeBuilder
+    return CategoryFakeBuilder;
   }
 
-  public static validate(entity: Category) {
+  public validate(fields?: string[]) {
     const validator = CategoryValidatorFactory.create();
-    if (!validator.validate(entity)) {
-      throw new EntityValidationError(validator.errors);
-    }
+    return validator.validate(this.notification, this, fields);
   }
 
   public toJSON() {

@@ -71,8 +71,7 @@ export class CategoryFakeBuilder<TBuild = any> {
         _,
         index,
       ) => {
-        //category.validate();
-        return new Category({
+        const category = new Category({
           category_id: !this._category_id
             ? undefined
             : this.callFactory(this._category_id, index),
@@ -83,6 +82,8 @@ export class CategoryFakeBuilder<TBuild = any> {
             created_at: this.callFactory(this._created_at, index),
           }),
         });
+        category.validate();
+        return category;
       });
     return this.countObjs === 1 ? (categories[0] as any) : categories;
   }
