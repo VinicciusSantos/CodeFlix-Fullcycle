@@ -1,12 +1,12 @@
-import { InMemorySearchableRepository } from "../../../shared/infra/db/in-memory/in-memory.repository";
-import { Uuid } from "../../../shared/domain/value-objects/uuid.vo";
-import { CategoryRepository } from "../../domain/category.repository";
-import { Category } from "../../domain/category.entity";
-import { SortDirection } from "../../../shared/domain/repository/search-params";
+import { InMemorySearchableRepository } from "../../../../shared/infra/db/in-memory/in-memory.repository";
+import { Uuid } from "../../../../shared/domain/value-objects/uuid.vo";
+import { ICategoryRepository } from "../../../domain/ICategoryRepository";
+import { Category } from "../../../domain/category.entity";
+import { SortDirection } from "../../../../shared/domain/repository/search-params";
 
 export class CategoryInMemoryRepository
   extends InMemorySearchableRepository<Category, Uuid>
-  implements CategoryRepository {
+  implements ICategoryRepository {
   protected sortableFields: string[] = ["name", "created_at"];
 
   public getEntity(): new (...args: any[]) => Category {
