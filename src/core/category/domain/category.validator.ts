@@ -1,11 +1,13 @@
 import { MaxLength } from 'class-validator';
 import { Category } from './category.entity';
-import { ClassValidatorFields } from '../../shared/domain/validators/class-validator-fields';
-import { Notification } from '../../shared/domain/validators/notification';
+import {
+  ClassValidatorFields,
+  Notification,
+} from '@core/shared/domain/validators';
 
 export class CategoryRules {
   @MaxLength(255, { groups: ['name'] })
-  public name: string;
+  name: string;
 
   constructor(entity: Category) {
     Object.assign(this as any, entity);

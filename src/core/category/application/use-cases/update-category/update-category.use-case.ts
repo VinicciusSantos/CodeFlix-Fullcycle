@@ -8,13 +8,14 @@ import {
   CategoryOutputMapper,
 } from '../common/category-output';
 import { UpdateCategoryInput } from './update-category.input';
+import { EntityValidationError } from '@core/shared/domain/validators';
 
 export type UpdateCategoryOutput = CategoryOutput;
 
 export class UpdateCategoryUseCase
-  implements IUseCase<UpdateCategoryInput, UpdateCategoryOutput>
-{
-  constructor(private categoryRepo: ICategoryRepository) {}
+  implements IUseCase<UpdateCategoryInput, UpdateCategoryOutput> {
+  constructor(private categoryRepo: ICategoryRepository) {
+  }
 
   public async execute(
     input: UpdateCategoryInput,
@@ -28,7 +29,7 @@ export class UpdateCategoryUseCase
 
     input.name && category.changeName(input.name);
 
-    if ('description' in input) {
+    if (input.description !== undefined) {
       category.changeDescription(input.description);
     }
 
@@ -36,6 +37,10 @@ export class UpdateCategoryUseCase
       category.activate();
     } else if (input.is_active === false) {
       category.deactivate();
+    }
+
+    if (category.notification.hasErrors()) {
+      throw new EntityValidationError(category.notification.toJSON());
     }
 
     await this.categoryRepo.update(category);

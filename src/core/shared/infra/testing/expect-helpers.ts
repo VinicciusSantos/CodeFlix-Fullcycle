@@ -1,4 +1,4 @@
-import { Notification } from '../../domain/validators/notification';
+import { Notification } from '@core/shared/domain/validators';
 
 expect.extend({
   notificationContainsErrorMessages(

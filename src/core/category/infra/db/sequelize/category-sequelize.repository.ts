@@ -1,6 +1,10 @@
-
 import { Category } from '../../../domain/category.entity';
-import { FindAndCountOptions, Op } from 'sequelize';
+import {
+  FindAndCountOptions,
+  literal,
+  Op,
+  UpdateOptions,
+} from 'sequelize';
 import { Uuid } from '@core/shared/domain/value-objects/uuid.vo';
 import { CategoryModel } from './category.model';
 import { NotFoundError } from '@core/shared/domain/errors/not-found.error';
@@ -10,78 +14,94 @@ import {
   CategorySearchResult,
   ICategoryRepository,
 } from '@core/category/domain/category.repository';
+import { SortDirection } from '@core/shared/domain/repository';
 
-export class CategorySequelizeRepository
-  implements ICategoryRepository {
-  public readonly sortableFields: string[] = ['name', 'created_at'];
+export class CategorySequelizeRepository implements ICategoryRepository {
+  sortableFields: string[] = ['name', 'created_at'];
+  orderBy = {
+    mysql: {
+      name: (sort_dir: SortDirection) => literal(`binary name ${sort_dir}`), //ascii
+    },
+  };
 
-  constructor(private categoryModel: typeof CategoryModel) {
+  constructor(private categoryModel: typeof CategoryModel) {}
+
+  async insert(entity: Category): Promise<void> {
+    const modelProps = CategoryModelMapper.toModel(entity);
+    await this.categoryModel.create(modelProps.toJSON());
   }
 
-  public async insert(entity: Category): Promise<void> {
-    const model = CategoryModelMapper.toModel(entity);
-    await this.categoryModel.create(model.toJSON());
-  }
-
-  public async bulkInsert(entities: Category[]): Promise<void> {
-    await this.categoryModel.bulkCreate(
-      entities.map((e) => CategoryModelMapper.toModel(e).toJSON()),
+  async bulkInsert(entities: Category[]): Promise<void> {
+    const modelsProps = entities.map((entity) =>
+      CategoryModelMapper.toModel(entity).toJSON(),
     );
+    await this.categoryModel.bulkCreate(modelsProps);
   }
 
-  public async findAll(): Promise<Category[]> {
-    const response = await this.categoryModel.findAll();
-    return response.map(CategoryModelMapper.toEntity);
-  }
+  async update(entity: Category): Promise<void> {
+    const id = entity.category_id.id;
 
-  public async findById(entity_id: Uuid): Promise<Category | null> {
-    return this._get(entity_id.id);
-  }
+    const modelProps = CategoryModelMapper.toModel(entity);
+    const [affectedRows] = await this.categoryModel.update(
+      modelProps.toJSON(),
+      {
+        where: { category_id: entity.category_id.id },
+      } as UpdateOptions,
+    );
 
-  public getEntity(): { new(...args: any[]): Category } {
-    return Category;
-  }
-
-  public async update(entity: Category): Promise<void> {
-    const { id } = entity.category_id;
-    const element = await this._get(id);
-    if (!element) {
-      throw new NotFoundError(id, Category);
+    if (affectedRows !== 1) {
+      throw new NotFoundError(id, this.getEntity());
     }
-    const modelToUpdate = CategoryModelMapper.toModel(entity);
-    await this.categoryModel.update(modelToUpdate.toJSON(), {
-      returning: false,
+  }
+
+  async delete(category_id: Uuid): Promise<void> {
+    const id = category_id.id;
+
+    const affectedRows = await this.categoryModel.destroy({
       where: { category_id: id },
     });
+
+    if (affectedRows !== 1) {
+      throw new NotFoundError(id, this.getEntity());
+    }
   }
 
-  public async delete(category_id: Uuid): Promise<void> {
-    const element = await this._get(category_id.id);
-    if (!element) {
-      throw new NotFoundError(category_id, Category);
-    }
-    await this.categoryModel.destroy({
-      where: { category_id: category_id.id },
+  async findById(entity_id: Uuid): Promise<Category | null> {
+    const model = await this.categoryModel.findByPk(entity_id.id);
+    return model ? CategoryModelMapper.toEntity(model) : null;
+  }
+
+  async findAll(): Promise<Category[]> {
+    const models = await this.categoryModel.findAll();
+    return models.map((model) => {
+      return CategoryModelMapper.toEntity(model);
     });
   }
 
   public async search(
     props: CategorySearchParams,
   ): Promise<CategorySearchResult> {
-    const { filter, page, per_page, sort, sort_dir } = props;
+    const {
+      filter,
+      page,
+      per_page,
+      sort,
+      sort_dir,
+    } = props;
     const offset = (page - 1) * per_page;
-    const { rows, count } = await this.categoryModel.findAndCountAll({
+    const {
+      rows,
+      count,
+    } = await this.categoryModel.findAndCountAll({
       ...(filter && { where: { name: { [Op.like]: `%${ filter }%` } } }),
-      order: [
-        sort && this.sortableFields.includes(sort)
-          ? [sort, sort_dir!]
-          : ['created_at', 'desc'],
-      ],
+      ...(sort && this.sortableFields.includes(sort)
+        ? { order: this.formatSort(sort, sort_dir) }
+        : { order: [['created_at', 'desc']] }),
       limit: per_page,
       offset,
     } as FindAndCountOptions);
 
-    return new CategorySearchResult<Category>({
+    return new CategorySearchResult({
       items: rows.map(CategoryModelMapper.toEntity),
       total: count,
       current_page: page,
@@ -89,11 +109,15 @@ export class CategorySequelizeRepository
     });
   }
 
-  private async _get(id: string): Promise<Category | null> {
-    const model = await this.categoryModel.findByPk(id);
-    if (!model) {
-      return null;
+  private formatSort(sort: string, sort_dir: SortDirection) {
+    const dialect = this.categoryModel.sequelize.getDialect() as 'mysql';
+    if (this.orderBy[dialect] && this.orderBy[dialect][sort]) {
+      return this.orderBy[dialect][sort](sort_dir);
     }
-    return CategoryModelMapper.toEntity(model);
+    return [[sort, sort_dir]];
+  }
+
+  getEntity(): new (...args: any[]) => Category {
+    return Category;
   }
 }
