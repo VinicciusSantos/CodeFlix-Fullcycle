@@ -1,8 +1,7 @@
-import { Uuid } from '../../shared/domain/value-objects/uuid.vo';
 import { CategoryValidatorFactory } from './category.validator';
-import { Entity } from '../../shared/domain/entity';
-import { ValueObject } from '../../shared/domain/value-object';
 import { CategoryFakeBuilder } from './category-fake.builder';
+import { Entity } from '@core/shared/domain/entity';
+import { Uuid, ValueObject } from '@core/shared/domain/value-objects';
 
 export interface CategoryProps {
   category_id?: Uuid;
@@ -18,7 +17,8 @@ export interface CategoryCreateCommand {
   is_active?: boolean;
 }
 
-export class Category extends Entity {
+export class Category
+  extends Entity {
   public readonly category_id: Uuid;
   public name: string;
   public description: string | null;

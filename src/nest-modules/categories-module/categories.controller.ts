@@ -1,12 +1,38 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
-import { CategorySequelizeRepository } from '@core/category/infra/db/sequelize/category-sequelize.repository';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete, Inject,
+} from '@nestjs/common';
+import { CreateCategoryDto, UpdateCategoryDto } from './dto';
+import {
+  CreateCategoryUseCase,
+  DeleteCategoryUseCase,
+  GetCategoryUseCase,
+  ListCategoriesUseCase,
+  UpdateCategoryUseCase,
+} from '@core/category/application/use-cases';
 
-@Controller('categories-module')
+@Controller('categories')
 export class CategoriesController {
-  constructor(private readonly categoryRepo: CategorySequelizeRepository) {
-  }
+  @Inject(CreateCategoryUseCase)
+  private createUseCase: CreateCategoryUseCase;
+
+  @Inject(UpdateCategoryUseCase)
+  private updateUseCase: UpdateCategoryUseCase;
+
+  @Inject(DeleteCategoryUseCase)
+  private deleteUseCase: DeleteCategoryUseCase;
+
+  @Inject(GetCategoryUseCase)
+  private getUseCase: GetCategoryUseCase;
+
+  @Inject(ListCategoriesUseCase)
+  private listUseCase: ListCategoriesUseCase;
+
 
   @Post()
   public create(@Body() createCategoryDto: CreateCategoryDto) {

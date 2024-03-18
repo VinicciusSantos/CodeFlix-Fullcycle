@@ -1,5 +1,5 @@
 import { Entity } from '../entity';
-import { ValueObject } from '../value-object';
+import { ValueObject } from '@core/shared/domain/value-objects';
 
 type SearchResultConstructorProps<E extends Entity> = {
   items: E[];
@@ -8,7 +8,8 @@ type SearchResultConstructorProps<E extends Entity> = {
   per_page: number;
 };
 
-export class SearchResult<A extends Entity = Entity> extends ValueObject {
+export class SearchResult<A extends Entity = Entity>
+  extends ValueObject {
   readonly items: A[];
   readonly total: number;
   readonly current_page: number;

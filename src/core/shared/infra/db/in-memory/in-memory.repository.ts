@@ -1,21 +1,19 @@
 import { Entity } from '../../../domain/entity';
-import {
-  IRepository,
-  ISearchableRepository,
-} from '../../../domain/repository/repository-interface';
-import { ValueObject } from '../../../domain/value-object';
-import { NotFoundError } from '../../../domain/errors/not-found.error';
+import { ValueObject } from '@core/shared/domain/value-objects';
+import { NotFoundError } from '@core/shared/domain/errors';
 import {
   SearchParams,
+  SearchResult,
   SortDirection,
-} from '../../../domain/repository/search-params';
-import { SearchResult } from '../../../domain/repository/search-result';
+  IRepository,
+  ISearchableRepository,
+} from '@core/shared/domain/repository';
 
 export abstract class InMemoryRepository<
   E extends Entity,
   EntityId extends ValueObject,
-> implements IRepository<E, EntityId>
-{
+>
+  implements IRepository<E, EntityId> {
   public items: E[] = [];
 
   public async insert(entity: E): Promise<void> {
@@ -59,13 +57,12 @@ export abstract class InMemoryRepository<
 }
 
 export abstract class InMemorySearchableRepository<
-    E extends Entity,
-    EntityId extends ValueObject,
-    Filter = string,
-  >
+  E extends Entity,
+  EntityId extends ValueObject,
+  Filter = string,
+>
   extends InMemoryRepository<E, EntityId>
-  implements ISearchableRepository<E, EntityId, Filter>
-{
+  implements ISearchableRepository<E, EntityId, Filter> {
   sortableFields: string[] = [];
 
   async search(props: SearchParams<Filter>): Promise<SearchResult<E>> {
@@ -107,13 +104,19 @@ export abstract class InMemorySearchableRepository<
     items: E[],
     sort: string | null,
     sort_dir: SortDirection | null,
-    custom_getter?: (sort: string, item: E) => any,
+    custom_getter?: (
+      sort: string,
+      item: E,
+    ) => any,
   ) {
     if (!sort || !this.sortableFields.includes(sort)) {
       return items;
     }
 
-    return [...items].sort((a, b) => {
+    return [...items].sort((
+      a,
+      b,
+    ) => {
       const aValue = custom_getter ? custom_getter(sort, a) : a[sort];
       const bValue = custom_getter ? custom_getter(sort, b) : b[sort];
       if (aValue < bValue) {

@@ -1,19 +1,22 @@
-import {
-  CategorySearchParams,
-  CategorySearchResult,
-  ICategoryRepository,
-} from '../../../domain/category.repository';
+
 import { Category } from '../../../domain/category.entity';
-import { Op } from 'sequelize';
+import { FindAndCountOptions, Op } from 'sequelize';
 import { Uuid } from '@core/shared/domain/value-objects/uuid.vo';
 import { CategoryModel } from './category.model';
 import { NotFoundError } from '@core/shared/domain/errors/not-found.error';
 import { CategoryModelMapper } from './category-model-mapper';
+import {
+  CategorySearchParams,
+  CategorySearchResult,
+  ICategoryRepository,
+} from '@core/category/domain/category.repository';
 
-export class CategorySequelizeRepository implements ICategoryRepository {
+export class CategorySequelizeRepository
+  implements ICategoryRepository {
   public readonly sortableFields: string[] = ['name', 'created_at'];
 
-  constructor(private categoryModel: typeof CategoryModel) {}
+  constructor(private categoryModel: typeof CategoryModel) {
+  }
 
   public async insert(entity: Category): Promise<void> {
     const model = CategoryModelMapper.toModel(entity);
@@ -35,7 +38,7 @@ export class CategorySequelizeRepository implements ICategoryRepository {
     return this._get(entity_id.id);
   }
 
-  public getEntity(): { new (...args: any[]): Category } {
+  public getEntity(): { new(...args: any[]): Category } {
     return Category;
   }
 
@@ -68,7 +71,7 @@ export class CategorySequelizeRepository implements ICategoryRepository {
     const { filter, page, per_page, sort, sort_dir } = props;
     const offset = (page - 1) * per_page;
     const { rows, count } = await this.categoryModel.findAndCountAll({
-      ...(filter && { where: { name: { [Op.like]: `%${filter}%` } } }),
+      ...(filter && { where: { name: { [Op.like]: `%${ filter }%` } } }),
       order: [
         sort && this.sortableFields.includes(sort)
           ? [sort, sort_dir!]
@@ -76,9 +79,9 @@ export class CategorySequelizeRepository implements ICategoryRepository {
       ],
       limit: per_page,
       offset,
-    });
+    } as FindAndCountOptions);
 
-    return new CategorySearchResult({
+    return new CategorySearchResult<Category>({
       items: rows.map(CategoryModelMapper.toEntity),
       total: count,
       current_page: page,

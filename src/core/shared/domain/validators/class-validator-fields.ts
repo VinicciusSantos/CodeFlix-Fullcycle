@@ -1,8 +1,9 @@
 import { validateSync } from 'class-validator';
-import { IValidatorFields } from './validator-fields-interface';
 import { Notification } from './notification';
+import { IValidatorFields } from '@core/shared/domain/validators';
 
-export abstract class ClassValidatorFields implements IValidatorFields {
+export abstract class ClassValidatorFields
+  implements IValidatorFields {
   public validate(
     notification: Notification,
     data: any,

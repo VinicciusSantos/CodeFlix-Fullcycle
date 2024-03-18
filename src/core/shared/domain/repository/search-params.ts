@@ -1,4 +1,4 @@
-import { ValueObject } from '../value-object';
+import { ValueObject } from '@core/shared/domain/value-objects';
 
 export type SortDirection = 'asc' | 'desc';
 
