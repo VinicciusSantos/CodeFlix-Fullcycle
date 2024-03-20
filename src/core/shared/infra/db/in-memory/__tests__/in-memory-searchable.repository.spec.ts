@@ -1,23 +1,25 @@
 import { Entity } from '../../../../domain/entity';
-import { SearchParams } from '../../../../domain/repository/search-params';
-import { SearchResult } from '../../../../domain/repository/search-result';
-import { Uuid } from '../../../../domain/value-objects/uuid.vo';
+import {
+  SearchResult,
+  SearchParams,
+} from '@core/shared/domain/repository';
 import { InMemorySearchableRepository } from '../in-memory.repository';
+import { CategoryId } from '@core/category/domain/category.aggregate';
 
 type StubEntityConstructorProps = {
-  entity_id?: Uuid;
+  entity_id?: CategoryId;
   name: string;
   price: number;
 };
 
 class StubEntity extends Entity {
-  entity_id: Uuid;
+  entity_id: CategoryId;
   name: string;
   price: number;
 
   constructor(props: StubEntityConstructorProps) {
     super();
-    this.entity_id = props.entity_id ?? new Uuid();
+    this.entity_id = props.entity_id ?? new CategoryId();
     this.name = props.name;
     this.price = +props.price;
   }
@@ -33,7 +35,7 @@ class StubEntity extends Entity {
 
 class StubInMemorySearchableRepository extends InMemorySearchableRepository<
   StubEntity,
-  Uuid
+  CategoryId
 > {
   sortableFields: string[] = ['name'];
 
@@ -65,7 +67,10 @@ describe('InMemorySearchableRepository Unit Tests', () => {
 
   describe('applyFilter method', () => {
     it('should no filter items when filter param is null', async () => {
-      const items = [new StubEntity({ name: 'name value', price: 5 })];
+      const items = [new StubEntity({
+        name: 'name value',
+        price: 5,
+      })];
       const spyFilterMethod = jest.spyOn(items, 'filter' as any);
       const itemsFiltered = await repository['applyFilter'](items, null);
       expect(itemsFiltered).toStrictEqual(items);
@@ -74,9 +79,18 @@ describe('InMemorySearchableRepository Unit Tests', () => {
 
     it('should filter using a filter param', async () => {
       const items = [
-        new StubEntity({ name: 'test', price: 5 }),
-        new StubEntity({ name: 'TEST', price: 5 }),
-        new StubEntity({ name: 'fake', price: 0 }),
+        new StubEntity({
+          name: 'test',
+          price: 5,
+        }),
+        new StubEntity({
+          name: 'TEST',
+          price: 5,
+        }),
+        new StubEntity({
+          name: 'fake',
+          price: 0,
+        }),
       ];
 
       const spyFilterMethod = jest.spyOn(items, 'filter' as any);
@@ -98,8 +112,14 @@ describe('InMemorySearchableRepository Unit Tests', () => {
   describe('applySort method', () => {
     it('should no sort items', async () => {
       const items = [
-        new StubEntity({ name: 'b', price: 5 }),
-        new StubEntity({ name: 'a', price: 5 }),
+        new StubEntity({
+          name: 'b',
+          price: 5,
+        }),
+        new StubEntity({
+          name: 'a',
+          price: 5,
+        }),
       ];
 
       let itemsSorted = repository['applySort'](items, null, null);
@@ -111,9 +131,18 @@ describe('InMemorySearchableRepository Unit Tests', () => {
 
     it('should sort items', async () => {
       const items = [
-        new StubEntity({ name: 'b', price: 5 }),
-        new StubEntity({ name: 'a', price: 5 }),
-        new StubEntity({ name: 'c', price: 5 }),
+        new StubEntity({
+          name: 'b',
+          price: 5,
+        }),
+        new StubEntity({
+          name: 'a',
+          price: 5,
+        }),
+        new StubEntity({
+          name: 'c',
+          price: 5,
+        }),
       ];
 
       let itemsSorted = repository['applySort'](items, 'name', 'asc');
@@ -127,11 +156,26 @@ describe('InMemorySearchableRepository Unit Tests', () => {
   describe('applyPaginate method', () => {
     it('should paginate items', async () => {
       const items = [
-        new StubEntity({ name: 'a', price: 5 }),
-        new StubEntity({ name: 'b', price: 5 }),
-        new StubEntity({ name: 'c', price: 5 }),
-        new StubEntity({ name: 'd', price: 5 }),
-        new StubEntity({ name: 'e', price: 5 }),
+        new StubEntity({
+          name: 'a',
+          price: 5,
+        }),
+        new StubEntity({
+          name: 'b',
+          price: 5,
+        }),
+        new StubEntity({
+          name: 'c',
+          price: 5,
+        }),
+        new StubEntity({
+          name: 'd',
+          price: 5,
+        }),
+        new StubEntity({
+          name: 'e',
+          price: 5,
+        }),
       ];
 
       let itemsPaginated = repository['applyPaginate'](items, 1, 2);
@@ -150,7 +194,10 @@ describe('InMemorySearchableRepository Unit Tests', () => {
 
   describe('search method', () => {
     it('should apply only paginate when other params are null', async () => {
-      const entity = new StubEntity({ name: 'a', price: 5 });
+      const entity = new StubEntity({
+        name: 'a',
+        price: 5,
+      });
       repository.items = Array(16).fill(entity);
 
       const result = await repository.search(new SearchParams());
@@ -166,15 +213,31 @@ describe('InMemorySearchableRepository Unit Tests', () => {
 
     it('should apply paginate and filter', async () => {
       const items = [
-        new StubEntity({ name: 'test', price: 5 }),
-        new StubEntity({ name: 'a', price: 5 }),
-        new StubEntity({ name: 'TEST', price: 5 }),
-        new StubEntity({ name: 'TeSt', price: 5 }),
+        new StubEntity({
+          name: 'test',
+          price: 5,
+        }),
+        new StubEntity({
+          name: 'a',
+          price: 5,
+        }),
+        new StubEntity({
+          name: 'TEST',
+          price: 5,
+        }),
+        new StubEntity({
+          name: 'TeSt',
+          price: 5,
+        }),
       ];
       repository.items = items;
 
       let result = await repository.search(
-        new SearchParams({ page: 1, per_page: 2, filter: 'TEST' }),
+        new SearchParams({
+          page: 1,
+          per_page: 2,
+          filter: 'TEST',
+        }),
       );
       expect(result).toStrictEqual(
         new SearchResult({
@@ -186,7 +249,11 @@ describe('InMemorySearchableRepository Unit Tests', () => {
       );
 
       result = await repository.search(
-        new SearchParams({ page: 2, per_page: 2, filter: 'TEST' }),
+        new SearchParams({
+          page: 2,
+          per_page: 2,
+          filter: 'TEST',
+        }),
       );
       expect(result).toStrictEqual(
         new SearchResult({
@@ -200,11 +267,26 @@ describe('InMemorySearchableRepository Unit Tests', () => {
 
     describe('should apply paginate and sort', () => {
       const items = [
-        new StubEntity({ name: 'b', price: 5 }),
-        new StubEntity({ name: 'a', price: 5 }),
-        new StubEntity({ name: 'd', price: 5 }),
-        new StubEntity({ name: 'e', price: 5 }),
-        new StubEntity({ name: 'c', price: 5 }),
+        new StubEntity({
+          name: 'b',
+          price: 5,
+        }),
+        new StubEntity({
+          name: 'a',
+          price: 5,
+        }),
+        new StubEntity({
+          name: 'd',
+          price: 5,
+        }),
+        new StubEntity({
+          name: 'e',
+          price: 5,
+        }),
+        new StubEntity({
+          name: 'c',
+          price: 5,
+        }),
       ];
       const arrange = [
         {
@@ -269,7 +351,10 @@ describe('InMemorySearchableRepository Unit Tests', () => {
 
       test.each(arrange)(
         'when value is %j',
-        async ({ search_params, search_result }) => {
+        async ({
+                 search_params,
+                 search_result,
+               }) => {
           const result = await repository.search(search_params);
           expect(result).toStrictEqual(search_result);
         },
@@ -278,11 +363,26 @@ describe('InMemorySearchableRepository Unit Tests', () => {
 
     it('should search using filter, sort and paginate', async () => {
       const items = [
-        new StubEntity({ name: 'test', price: 5 }),
-        new StubEntity({ name: 'a', price: 5 }),
-        new StubEntity({ name: 'TEST', price: 5 }),
-        new StubEntity({ name: 'e', price: 5 }),
-        new StubEntity({ name: 'TeSt', price: 5 }),
+        new StubEntity({
+          name: 'test',
+          price: 5,
+        }),
+        new StubEntity({
+          name: 'a',
+          price: 5,
+        }),
+        new StubEntity({
+          name: 'TEST',
+          price: 5,
+        }),
+        new StubEntity({
+          name: 'e',
+          price: 5,
+        }),
+        new StubEntity({
+          name: 'TeSt',
+          price: 5,
+        }),
       ];
       repository.items = items;
 

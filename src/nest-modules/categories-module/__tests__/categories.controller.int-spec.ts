@@ -24,9 +24,11 @@ import {
   ListCategoriesFixture,
   UpdateCategoryFixture,
 } from '../testing';
-import { Category } from '@core/category/domain/category.entity';
+import {
+  Category,
+  CategoryId,
+} from '@core/category/domain/category.aggregate';
 import { CategoryPresenter } from '../categories.presenter';
-import { Uuid } from '@core/shared/domain/value-objects';
 import {
   SearchCategoriesDto,
   UpdateCategoryDto,
@@ -64,7 +66,7 @@ describe('CategoriesController Integration Tests', () => {
                expected,
              }) => {
         const presenter = await controller.create(send_data);
-        const entity = await repository.findById(new Uuid(presenter.id));
+        const entity = await repository.findById(new CategoryId(presenter.id));
         expect(entity.toJSON()).toStrictEqual({
           category_id: presenter.id,
           created_at: presenter.created_at,
@@ -95,7 +97,7 @@ describe('CategoriesController Integration Tests', () => {
           category.category_id.id,
           send_data as UpdateCategoryDto,
         );
-        const entity = await repository.findById(new Uuid(presenter.id));
+        const entity = await repository.findById(new CategoryId(presenter.id));
         expect(entity.toJSON()).toStrictEqual({
           category_id: presenter.id,
           created_at: presenter.created_at,

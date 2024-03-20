@@ -1,6 +1,8 @@
 import { NotFoundError } from '@core/shared/domain/errors/not-found.error';
-import { Uuid } from '@core/shared/domain/value-objects/uuid.vo';
-import { Category } from '../../../domain/category.entity';
+import {
+  Category,
+  CategoryId,
+} from '../../../domain/category.aggregate';
 import { ICategoryRepository } from '../../../domain/category.repository';
 import { IUseCase } from '@core/shared/application/use-case.interface';
 import {
@@ -20,8 +22,8 @@ export class UpdateCategoryUseCase
   public async execute(
     input: UpdateCategoryInput,
   ): Promise<UpdateCategoryOutput> {
-    const uuid = new Uuid(input.id);
-    const category = await this.categoryRepo.findById(uuid);
+    const categoryId = new CategoryId(input.id);
+    const category = await this.categoryRepo.findById(categoryId);
 
     if (!category) {
       throw new NotFoundError(input.id, Category);

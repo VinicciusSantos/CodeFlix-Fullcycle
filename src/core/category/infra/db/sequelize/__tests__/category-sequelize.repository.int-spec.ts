@@ -1,14 +1,16 @@
 import { CategoryModel } from '../category.model';
 import { CategorySequelizeRepository } from '../category-sequelize.repository';
-import { Category } from '../../../../domain/category.entity';
-import { Uuid } from '../../../../../shared/domain/value-objects/uuid.vo';
-import { NotFoundError } from '../../../../../shared/domain/errors/not-found.error';
+import {
+  Category,
+  CategoryId,
+} from '../../../../domain/category.aggregate';
+import { NotFoundError } from '@core/shared/domain/errors';
 import {
   CategorySearchParams,
   CategorySearchResult,
 } from '../../../../domain/category.repository';
 import { CategoryModelMapper } from '../category-model-mapper';
-import { setupSequelize } from '../../../../../shared/infra/testing/helpers';
+import { setupSequelize } from '@core/shared/infra/testing/helpers';
 
 describe('CategorySequelizeRepository Integration Test', () => {
   setupSequelize({ models: [CategoryModel] });
@@ -26,7 +28,7 @@ describe('CategorySequelizeRepository Integration Test', () => {
   });
 
   it('should finds a entity by id', async () => {
-    let entityFound = await repository.findById(new Uuid());
+    let entityFound = await repository.findById(new CategoryId());
     expect(entityFound).toBeNull();
 
     const entity = Category.fake().aCategory().build();
@@ -62,7 +64,7 @@ describe('CategorySequelizeRepository Integration Test', () => {
   });
 
   it('should throw error on delete when a entity not found', async () => {
-    const categoryId = new Uuid();
+    const categoryId = new CategoryId();
     await expect(repository.delete(categoryId)).rejects.toThrow(
       new NotFoundError(categoryId.id, Category),
     );
@@ -116,14 +118,17 @@ describe('CategorySequelizeRepository Integration Test', () => {
       const created_at = new Date();
       const categories = Category.fake()
         .theCategories(16)
-        .withName((index) => `Movie ${index}`)
+        .withName((index) => `Movie ${ index }`)
         .withDescription(null)
         .withCreatedAt((index) => new Date(created_at.getTime() + index))
         .build();
       const searchOutput = await repository.search(new CategorySearchParams());
       const items = searchOutput.items;
-      [...items].reverse().forEach((item, index) => {
-        expect(`Movie ${index}`).toBe(`${categories[index + 1].name}`);
+      [...items].reverse().forEach((
+        item,
+        index,
+      ) => {
+        expect(`Movie ${ index }`).toBe(`${ categories[index + 1].name }`);
       });
     });
 
@@ -307,7 +312,10 @@ describe('CategorySequelizeRepository Integration Test', () => {
 
       test.each(arrange)(
         'when value is $search_params',
-        async ({ search_params, search_result }) => {
+        async ({
+                 search_params,
+                 search_result,
+               }) => {
           const result = await repository.search(search_params);
           expect(result.toJSON(true)).toMatchObject(search_result.toJSON(true));
         },

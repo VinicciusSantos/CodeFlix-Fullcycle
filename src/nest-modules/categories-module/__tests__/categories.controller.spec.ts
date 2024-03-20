@@ -37,7 +37,7 @@ describe('CategoriesController Unit Tests', () => {
       execute: jest.fn().mockReturnValue(Promise.resolve(output)),
     };
 
-    controller['createUseCase'] = mockCreateUseCase as typeof controller['createUseCase'];
+    controller['createUseCase'] = mockCreateUseCase as any;
     const input: CreateCategoryDto = {
       name: 'Movie',
       description: 'some description',
@@ -66,7 +66,7 @@ describe('CategoriesController Unit Tests', () => {
       execute: jest.fn().mockReturnValue(Promise.resolve(output)),
     };
 
-    controller['updateUseCase'] = mockUpdateUseCase as typeof controller['updateUseCase'];
+    controller['updateUseCase'] = mockUpdateUseCase as any;
     const input = {
       name: 'Movie',
       description: 'some description',
@@ -84,7 +84,7 @@ describe('CategoriesController Unit Tests', () => {
       execute: jest.fn().mockReturnValue(Promise.resolve(expectedOutput)),
     };
 
-    controller['deleteUseCase'] = mockDeleteUseCase as typeof controller['deleteUseCase'];
+    controller['deleteUseCase'] = mockDeleteUseCase as any;
     const id = '9366b7dc-2d71-4799-b91c-c64adb205104';
     expect(controller.remove(id)).toBeInstanceOf(Promise);
     const output = await controller.remove(id);
@@ -105,7 +105,7 @@ describe('CategoriesController Unit Tests', () => {
       execute: jest.fn().mockReturnValue(Promise.resolve(output)),
     };
 
-    controller['getUseCase'] = mockGetUseCase as typeof controller['getUseCase'];
+    controller['getUseCase'] = mockGetUseCase as any;
     const presenter = await controller.findOne(id);
     expect(mockGetUseCase.execute).toHaveBeenCalledWith({ id });
     expect(presenter).toBeInstanceOf(CategoryPresenter);
@@ -132,7 +132,7 @@ describe('CategoriesController Unit Tests', () => {
       execute: jest.fn().mockReturnValue(Promise.resolve(output)),
     };
 
-    controller['listUseCase'] = mockListUseCase as typeof controller['listUseCase'];
+    controller['listUseCase'] = mockListUseCase as any;
     const searchParams = {
       page: 1,
       per_page: 2,

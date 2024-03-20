@@ -3,14 +3,13 @@ import { instanceToPlain } from 'class-transformer';
 import { ICategoryRepository } from '@core/category/domain/category.repository';
 import * as CategoryProviders from '../../src/nest-modules/categories-module/categories.providers';
 import { CategoryOutputMapper } from '@core/category/application/use-cases';
-import { Uuid } from '@core/shared/domain/value-objects';
 import { startApp } from '../../src/nest-modules/shared-module/testing/helpers';
 import { CategoriesController } from '../../src/nest-modules/categories-module';
-import { Category } from '@core/category/domain/category.entity';
+import { Category, CategoryId } from '@core/category/domain/category.aggregate';
 import { UpdateCategoryFixture } from '../../src/nest-modules/categories-module/testing';
 
 describe('CategoriesController (e2e)', () => {
-  const uuid = '9366b7dc-2d71-4799-b91c-c64adb205104';
+  const categoryId = '9366b7dc-2d71-4799-b91c-c64adb205104';
 
   describe('/categories/:id (PATCH)', () => {
     describe('should a response error when id is invalid or not found', () => {
@@ -40,13 +39,9 @@ describe('CategoriesController (e2e)', () => {
 
       test.each(arrange)(
         'when id is $id',
-        async ({
-                 id,
-                 send_data,
-                 expected,
-               }) => {
+        async ({ id, send_data, expected }) => {
           return request(nestApp.app.getHttpServer())
-            .patch(`/categories/${ id }`)
+            .patch(`/categories/${id}`)
             .send(send_data)
             .expect(expected.statusCode)
             .expect(expected);
@@ -63,7 +58,7 @@ describe('CategoriesController (e2e)', () => {
       }));
       test.each(arrange)('when body is $label', ({ value }) => {
         return request(app.app.getHttpServer())
-          .patch(`/categories/${ uuid }`)
+          .patch(`/categories/${categoryId}`)
           .send(value.send_data)
           .expect(422)
           .expect(value.expected);
@@ -89,7 +84,7 @@ describe('CategoriesController (e2e)', () => {
         const category = Category.fake().aCategory().build();
         await categoryRepo.insert(category);
         return request(app.app.getHttpServer())
-          .patch(`/categories/${ category.category_id.id }`)
+          .patch(`/categories/${category.category_id.id}`)
           .send(value.send_data)
           .expect(422)
           .expect(value.expected);
@@ -108,22 +103,21 @@ describe('CategoriesController (e2e)', () => {
       });
       test.each(arrange)(
         'when body is $send_data',
-        async ({
-                 send_data,
-                 expected,
-               }) => {
+        async ({ send_data, expected }) => {
           const categoryCreated = Category.fake().aCategory().build();
           await categoryRepo.insert(categoryCreated);
 
           const res = await request(appHelper.app.getHttpServer())
-            .patch(`/categories/${ categoryCreated.category_id.id }`)
+            .patch(`/categories/${categoryCreated.category_id.id}`)
             .send(send_data)
             .expect(200);
           const keyInResponse = UpdateCategoryFixture.keysInResponse;
           expect(Object.keys(res.body)).toStrictEqual(['data']);
           expect(Object.keys(res.body.data)).toStrictEqual(keyInResponse);
           const id = res.body.data.id;
-          const categoryUpdated = await categoryRepo.findById(new Uuid(id));
+          const categoryUpdated = await categoryRepo.findById(
+            new CategoryId(id),
+          );
           const presenter = CategoriesController.serialize(
             CategoryOutputMapper.toOutput(categoryUpdated),
           );

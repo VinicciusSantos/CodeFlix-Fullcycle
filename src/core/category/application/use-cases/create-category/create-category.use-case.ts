@@ -1,5 +1,5 @@
-import { IUseCase } from '../../../../shared/application/use-case.interface';
-import { Category } from '../../../domain/category.entity';
+import { IUseCase } from '@core/shared/application';
+import { Category } from '../../../domain/category.aggregate';
 import { ICategoryRepository } from '../../../domain/category.repository';
 import {
   CategoryOutput,

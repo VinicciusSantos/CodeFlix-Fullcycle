@@ -3,8 +3,10 @@ import { CategoryFakeBuilder } from './category-fake.builder';
 import { Entity } from '@core/shared/domain/entity';
 import { Uuid, ValueObject } from '@core/shared/domain/value-objects';
 
+export class CategoryId extends Uuid {}
+
 export interface CategoryProps {
-  category_id?: Uuid;
+  category_id?: CategoryId;
   name: string;
   description?: string | null;
   is_active?: boolean;
@@ -17,9 +19,8 @@ export interface CategoryCreateCommand {
   is_active?: boolean;
 }
 
-export class Category
-  extends Entity {
-  public readonly category_id: Uuid;
+export class Category extends Entity {
+  public readonly category_id: CategoryId;
   public name: string;
   public description: string | null;
   public is_active: boolean;
@@ -31,7 +32,7 @@ export class Category
 
   constructor(props: CategoryProps) {
     super();
-    this.category_id = props.category_id ?? new Uuid();
+    this.category_id = props.category_id ?? new CategoryId();
     this.name = props.name;
     this.description = props.description ?? null;
     this.is_active = props.is_active ?? true;

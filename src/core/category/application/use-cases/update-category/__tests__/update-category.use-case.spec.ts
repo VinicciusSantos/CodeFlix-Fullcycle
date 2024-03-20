@@ -1,10 +1,12 @@
-import { NotFoundError } from '../../../../../shared/domain/errors/not-found.error';
+import { NotFoundError } from '@core/shared/domain/errors';
 import {
   InvalidUuidError,
-  Uuid,
-} from '../../../../../shared/domain/value-objects/uuid.vo';
-import { Category } from '../../../../domain/category.entity';
-import { CategoryInMemoryRepository } from '../../../../infra/db/in-memory/category-in-memory.repository';
+} from '@core/shared/domain/value-objects';
+import {
+  Category,
+  CategoryId,
+} from '../../../../domain/category.aggregate';
+import { CategoryInMemoryRepository } from '@core/category/infra/db/in-memory';
 import { UpdateCategoryUseCase } from '../update-category.use-case';
 
 describe('UpdateCategoryUseCase Unit Tests', () => {
@@ -18,13 +20,19 @@ describe('UpdateCategoryUseCase Unit Tests', () => {
 
   it('should throws error when entity not found', async () => {
     await expect(() =>
-      useCase.execute({ id: 'fake id', name: 'fake' }),
+      useCase.execute({
+        id: 'fake id',
+        name: 'fake',
+      }),
     ).rejects.toThrow(new InvalidUuidError());
 
-    const uuid = new Uuid();
+    const uuid = new CategoryId();
 
     await expect(() =>
-      useCase.execute({ id: uuid.id, name: 'fake' }),
+      useCase.execute({
+        id: uuid.id,
+        name: 'fake',
+      }),
     ).rejects.toThrow(new NotFoundError(uuid.id, Category));
   });
 
