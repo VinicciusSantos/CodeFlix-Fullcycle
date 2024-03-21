@@ -64,7 +64,7 @@ describe('CategoriesController (e2e)', () => {
         await categoryRepo.bulkInsert(Object.values(entitiesMap));
       });
 
-      test.each([arrange[0]])(
+      test.each([arrange])(
         'when query params is $send_data',
         async ({
                  send_data,

@@ -117,7 +117,7 @@ describe('CategoriesController (e2e)', () => {
           const id = res.body.data.id;
           const categoryUpdated = await categoryRepo.findById(
             new CategoryId(id),
-          );
+          )!;
           const presenter = CategoriesController.serialize(
             CategoryOutputMapper.toOutput(categoryUpdated),
           );
