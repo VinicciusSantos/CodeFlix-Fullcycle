@@ -1,4 +1,5 @@
 import { Notification } from '@core/shared/domain/validators';
+import { ValueObject } from '@core/shared/domain/value-objects';
 
 expect.extend({
   notificationContainsErrorMessages(
@@ -29,5 +30,16 @@ expect.extend({
               received,
             )}. Current: ${JSON.stringify(expected.toJSON())}`,
         };
+  },
+  toBeValueObject(expected: ValueObject, received: ValueObject) {
+    return expected.equals(received)
+      ? { pass: true, message: () => '' }
+      : {
+        pass: false,
+        message: () =>
+          `The values object are not equal. Expected: ${JSON.stringify(
+            expected,
+          )} | Received: ${JSON.stringify(received)}`,
+      };
   },
 });

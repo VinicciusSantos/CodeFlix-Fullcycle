@@ -1,11 +1,11 @@
-// import { FieldsErrors } from "./shared-module/domain/validators/validator-fields-interface";
-
+import { ValueObject } from '@core/shared/domain/value-objects';
 declare global {
   namespace jest {
     interface Matchers<R> {
       notificationContainsErrorMessages: (
         expected: Array<string | { [key: string]: string[] }>,
       ) => R;
+      toBeValueObject: (expected: ValueObject) => R;
     }
   }
 }
