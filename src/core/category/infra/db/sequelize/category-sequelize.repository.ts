@@ -1,4 +1,7 @@
-import { Category, CategoryId } from '../../../domain/category.aggregate';
+import {
+  Category,
+  CategoryId,
+} from '../../../domain/category.aggregate';
 import {
   FindAndCountOptions,
   literal,
@@ -14,16 +17,18 @@ import {
   ICategoryRepository,
 } from '@core/category/domain/category.repository';
 import { SortDirection } from '@core/shared/domain/repository';
+import { InvalidArgumentError } from '@core/shared/domain/errors';
 
 export class CategorySequelizeRepository implements ICategoryRepository {
   sortableFields: string[] = ['name', 'created_at'];
   orderBy = {
     mysql: {
-      name: (sort_dir: SortDirection) => literal(`binary name ${sort_dir}`), //ascii
+      name: (sort_dir: SortDirection) => literal(`binary name ${ sort_dir }`), //ascii
     },
   };
 
-  constructor(private categoryModel: typeof CategoryModel) {}
+  constructor(private categoryModel: typeof CategoryModel) {
+  }
 
   async insert(entity: Category): Promise<void> {
     const modelProps = CategoryModelMapper.toModel(entity);
@@ -108,12 +113,55 @@ export class CategorySequelizeRepository implements ICategoryRepository {
     });
   }
 
-  private formatSort(sort: string, sort_dir: SortDirection) {
+  private formatSort(
+    sort: string,
+    sort_dir: SortDirection,
+  ) {
     const dialect = this.categoryModel.sequelize.getDialect() as 'mysql';
     if (this.orderBy[dialect] && this.orderBy[dialect][sort]) {
       return this.orderBy[dialect][sort](sort_dir);
     }
     return [[sort, sort_dir]];
+  }
+
+  async findByIds(ids: CategoryId[]): Promise<Category[]> {
+    const models = await this.categoryModel.findAll({
+      where: {
+        category_id: {
+          [Op.in]: ids.map((id) => id.id),
+        },
+      },
+    });
+    return models.map((m) => CategoryModelMapper.toEntity(m));
+  }
+
+  async existsById(
+    ids: CategoryId[],
+  ): Promise<{ exists: CategoryId[]; not_exists: CategoryId[] }> {
+    if (!ids.length) {
+      throw new InvalidArgumentError(
+        'ids must be an array with at least one element',
+      );
+    }
+
+    const existsCategoryModels = await this.categoryModel.findAll({
+      attributes: ['category_id'],
+      where: {
+        category_id: {
+          [Op.in]: ids.map((id) => id.id),
+        },
+      },
+    });
+    const existsCategoryIds = existsCategoryModels.map(
+      (m) => new CategoryId(m.category_id),
+    );
+    const notExistsCategoryIds = ids.filter(
+      (id) => !existsCategoryIds.some((e) => e.equals(id)),
+    );
+    return {
+      exists: existsCategoryIds,
+      not_exists: notExistsCategoryIds,
+    };
   }
 
   getEntity(): new (...args: any[]) => Category {

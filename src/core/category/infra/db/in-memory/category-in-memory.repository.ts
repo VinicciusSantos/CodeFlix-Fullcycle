@@ -6,8 +6,7 @@ import { SortDirection } from '@core/shared/domain/repository/search-params';
 
 export class CategoryInMemoryRepository
   extends InMemorySearchableRepository<Category, Uuid>
-  implements ICategoryRepository
-{
+  implements ICategoryRepository {
   public sortableFields: string[] = ['name', 'created_at'];
 
   public getEntity(): new (...args: any[]) => Category {
@@ -35,5 +34,28 @@ export class CategoryInMemoryRepository
     return sort
       ? super.applySort(items, sort, sort_dir)
       : super.applySort(items, 'created_at', 'desc');
+  }
+
+  async existsById(ids: Uuid[]): Promise<{ exists: Uuid[]; not_exists: Uuid[] }> {
+    const exists = [];
+    const not_exists = [];
+
+    for (const id of ids) {
+      const existsCategory = this.items.find((c: Category) => c.category_id.equals(id));
+      if (existsCategory) {
+        exists.push(id);
+      } else {
+        not_exists.push(id);
+      }
+    }
+
+    return {
+      exists,
+      not_exists,
+    };
+  }
+
+  async findByIds(ids: Uuid[]): Promise<Category[]> {
+    return this.items.filter((c: Category) => ids.some((id) => c.category_id.equals(id)));
   }
 }
