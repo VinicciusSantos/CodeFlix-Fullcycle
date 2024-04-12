@@ -54,6 +54,27 @@ export abstract class InMemoryRepository<
   }
 
   public abstract getEntity(): new (...args: any[]) => E;
+
+  async existsById(ids: EntityId[]): Promise<{ exists: EntityId[]; not_exists: EntityId[] }> {
+    const exists = [];
+    const not_exists = [];
+    for (const id of ids) {
+      const item = this.items.find((item) => item.entity_id.equals(id));
+      if (item) {
+        exists.push(id);
+      } else {
+        not_exists.push(id);
+      }
+    }
+    return {
+      exists,
+      not_exists,
+    };
+  }
+
+  async findByIds(ids: EntityId[]): Promise<E[]> {
+    return this.items.filter((item) => ids.some((id) => item.entity_id.equals(id)));
+  }
 }
 
 export abstract class InMemorySearchableRepository<

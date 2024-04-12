@@ -181,7 +181,7 @@ export class GenreSequelizeRepository implements IGenreRepository {
       if (props.filter.categories_id) {
         wheres.push({
           field: 'categories_id',
-          value: props.filter.categories_id.map((c: CategoryId) => c.id),
+          value: props.filter.categories_id.map((c: any) => c.id),
           get condition() {
             return {
               ['$categories_id.category_id$']: {
@@ -207,7 +207,7 @@ export class GenreSequelizeRepository implements IGenreRepository {
       ),
       where: wheres.length ? { [Op.and]: wheres.map((w) => w.condition) } : {},
       transaction: this.uow.getTransaction()
-    }) as number;
+    }) as unknown as number;
 
     const columnOrder = orderBy.replace('binary', '').trim().split(' ')[0];
 

@@ -16,11 +16,11 @@ export interface GenreFilter {
 }
 
 export class GenreSearchParams extends SearchParams<GenreFilter> {
-  protected get filter(): GenreFilter | null {
+  public get filter(): GenreFilter | null {
     return this._filter;
   }
 
-  protected set filter(value: GenreFilter | null) {
+  public set filter(value: GenreFilter | null) {
     const _value =
       value && (value as unknown) !== '' && typeof value === 'object'
         ? value
