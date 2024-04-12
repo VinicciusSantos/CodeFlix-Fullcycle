@@ -4,7 +4,7 @@ import { DataTypes } from 'sequelize';
 
 export const up: MigrationFn<Sequelize> = async ({ context: sequelize }) => {
   await sequelize.getQueryInterface().createTable('categories', {
-    id: {
+    category_id: {
       type: DataTypes.UUID,
       allowNull: false,
       primaryKey: true,
