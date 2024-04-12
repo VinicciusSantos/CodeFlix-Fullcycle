@@ -874,7 +874,7 @@ describe('GenreSequelizeRepository Integration Tests', () => {
     });
 
     describe('bulkInsert method', () => {
-      it('should insert a list of genres', async () => {
+      it('should insert a list of genres-module', async () => {
         const category = Category.fake().aCategory().build();
         await categoryRepo.insert(category);
         const genres = Genre.fake()
@@ -933,7 +933,7 @@ describe('GenreSequelizeRepository Integration Tests', () => {
     });
 
     describe('findAll method', () => {
-      it('should return a list of genres', async () => {
+      it('should return a list of genres-module', async () => {
         const category = Category.fake().aCategory().build();
         await categoryRepo.insert(category);
         const genres = Genre.fake()
@@ -950,7 +950,7 @@ describe('GenreSequelizeRepository Integration Tests', () => {
     });
 
     describe('findByIds method', () => {
-      it('should return a list of genres', async () => {
+      it('should return a list of genres-module', async () => {
         const category = Category.fake().aCategory().build();
         await categoryRepo.insert(category);
         const genres = Genre.fake()
@@ -1056,7 +1056,7 @@ describe('GenreSequelizeRepository Integration Tests', () => {
     });
 
     describe('search method', () => {
-      it('should return a list of genres', async () => {
+      it('should return a list of genres-module', async () => {
         const category = Category.fake().aCategory().build();
         await categoryRepo.insert(category);
         const genres = Genre.fake()

@@ -1,4 +1,4 @@
-import { CategoriesIdExistsInStorageValidator } from '@core/category/application/validations/categories-ids-exists-in-storage.validator';
+import { CategoriesIdExistsInDatabaseValidator } from '@core/category/application/validations/categories-ids-exists-in-database.validator';
 import { ICategoryRepository } from '@core/category/domain/category.repository';
 import { IUseCase } from '@core/shared/application';
 import { IUnitOfWork } from '@core/shared/domain/repository/unit-of-work.interface';
@@ -17,7 +17,7 @@ export class CreateGenreUseCase
     private uow: IUnitOfWork,
     private genreRepo: IGenreRepository,
     private categoryRepo: ICategoryRepository,
-    private categoriesIdExistsInStorage: CategoriesIdExistsInStorageValidator,
+    private categoriesIdExistsInStorage: CategoriesIdExistsInDatabaseValidator,
   ) {
   }
 

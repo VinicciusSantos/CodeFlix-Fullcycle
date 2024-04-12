@@ -6,7 +6,7 @@ import {
 } from '../../domain/category.aggregate';
 import { ICategoryRepository } from '../../domain/category.repository';
 
-export class CategoriesIdExistsInStorageValidator {
+export class CategoriesIdExistsInDatabaseValidator {
   constructor(private categoryRepo: ICategoryRepository) {
   }
 
