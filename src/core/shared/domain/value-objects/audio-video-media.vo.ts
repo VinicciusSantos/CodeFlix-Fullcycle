@@ -9,7 +9,7 @@ export enum AudioVideoMediaStatus {
 
 export abstract class AudioVideoMedia extends ValueObject {
   readonly name: string;
-  readonly raw_location: string; //mp4
+  readonly raw_location: string;
   readonly encoded_location: string | null;
   readonly status: AudioVideoMediaStatus;
 

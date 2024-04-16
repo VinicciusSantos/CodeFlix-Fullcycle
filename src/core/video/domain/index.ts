@@ -4,6 +4,7 @@ export * from './thumbnail.vo';
 export * from './thumbnail-half.vo';
 export * from './trailer.vo';
 export * from './video.aggregate';
+export * from './video.repository';
 export * from './video.validator';
 export * from './video-fake.builder';
 export * from './video-media.vo';
