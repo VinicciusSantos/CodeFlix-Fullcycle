@@ -144,7 +144,7 @@ describe('Video Unit Tests', () => {
       const genres_id = [new GenreId()];
       const cast_members_id = [new CastMemberId()];
 
-      const spyOnVideCreated = jest.spyOn(Video.prototype, 'onVideoCreated');
+      const spyOnVideCreated = jest.spyOn(Video.prototype as any, 'onVideoCreated');
       const tryMarkAsPublished = jest.spyOn(
         Video.prototype as any,
         'tryMarkAsPublished',
@@ -193,7 +193,7 @@ describe('Video Unit Tests', () => {
       const genres_id = [new GenreId()];
       const cast_members_id = [new CastMemberId()];
 
-      const spyOnVideCreated = jest.spyOn(Video.prototype, 'onVideoCreated');
+      const spyOnVideCreated = jest.spyOn(Video.prototype as any, 'onVideoCreated');
       const tryMarkAsPublished = jest.spyOn(
         Video.prototype as any,
         'tryMarkAsPublished',
