@@ -1,8 +1,32 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule as NestConfigModule, ConfigModuleOptions } from '@nestjs/config';
+import {
+  ConfigModule as NestConfigModule,
+  ConfigModuleOptions,
+} from '@nestjs/config';
 import { join } from 'path';
-import * as Joi from 'joi';
+import Joi from 'joi';
 import * as process from 'process';
+
+const joiJson = Joi.extend((joi) => {
+  return {
+    type: 'object',
+    base: joi.object(),
+    coerce(
+      value,
+      _schema,
+    ) {
+      if (value[0] !== '{' && !/^\s*\{/.test(value)) {
+        return;
+      }
+
+      try {
+        return { value: JSON.parse(value) };
+      } catch (err) {
+        console.error(err);
+      }
+    },
+  };
+});
 
 export type CONFIG_SCHEMA_TYPE = DB_SCHEMA_TYPE;
 
@@ -16,6 +40,16 @@ export interface DB_SCHEMA_TYPE {
   DB_LOGGING: boolean;
   DB_AUTO_LOAD_MODELS: boolean;
 }
+
+export interface CONFIG_GOOGLE_SCHEMA_TYPE {
+  GOOGLE_CLOUD_CREDENTIALS: object;
+  GOOGLE_CLOUD_STORAGE_BUCKET_NAME: string;
+}
+
+export const GOOGLE_CLOUD_SCHEMA: Joi.StrictSchemaMap<CONFIG_GOOGLE_SCHEMA_TYPE> = {
+  GOOGLE_CLOUD_CREDENTIALS: joiJson.object().required(),
+  GOOGLE_CLOUD_STORAGE_BUCKET_NAME: Joi.string().required(),
+};
 
 export const CONFIG_DB_SCHEMA: Joi.StrictSchemaMap<DB_SCHEMA_TYPE> = {
   DB_VENDOR: Joi.string().required().valid('mysql', 'sqlite'),
@@ -44,7 +78,10 @@ export const CONFIG_DB_SCHEMA: Joi.StrictSchemaMap<DB_SCHEMA_TYPE> = {
 export class ConfigModule
   extends NestConfigModule {
   static forRoot(options: ConfigModuleOptions = {}) {
-    const { envFilePath, ...otherOptions } = options;
+    const {
+      envFilePath,
+      ...otherOptions
+    } = options;
     return super.forRoot({
       envFilePath: [
         ...(Array.isArray(envFilePath) ? envFilePath : [envFilePath]),
@@ -52,7 +89,10 @@ export class ConfigModule
         join(process.cwd(), 'envs', `.env`),
       ],
       isGlobal: true,
-      validationSchema: Joi.object(CONFIG_DB_SCHEMA),
+      validationSchema: Joi.object({
+        ...CONFIG_DB_SCHEMA,
+        ...GOOGLE_CLOUD_SCHEMA,
+      }),
       ...otherOptions,
     });
   }

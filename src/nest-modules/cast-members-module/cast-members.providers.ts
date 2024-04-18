@@ -12,6 +12,7 @@ import {
 } from '@core/cast-member/infra/db/sequelize';
 import { ICastMemberRepository } from '@core/cast-member/domain/cast-member.repository';
 import { CastMemberInMemoryRepository } from '@core/cast-member/infra/db/in-memory/cast-member-in-memory.repository';
+import { CastMembersIdExistsInDatabaseValidator } from '@core/cast-member/application/validations';
 
 export const REPOSITORIES = {
   CAST_MEMBER_REPOSITORY: {
@@ -69,7 +70,18 @@ export const USE_CASES = {
   },
 };
 
+export const VALIDATIONS = {
+  CAST_MEMBERS_IDS_EXISTS_IN_DATABASE_VALIDATOR: {
+    provide: CastMembersIdExistsInDatabaseValidator,
+    useFactory: (castMemberRepo: ICastMemberRepository) => {
+      return new CastMembersIdExistsInDatabaseValidator(castMemberRepo);
+    },
+    inject: [REPOSITORIES.CAST_MEMBER_REPOSITORY.provide],
+  },
+};
+
 export const CAST_MEMBERS_PROVIDERS = {
   REPOSITORIES,
   USE_CASES,
+  VALIDATIONS,
 };
