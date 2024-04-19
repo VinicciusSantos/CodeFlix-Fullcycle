@@ -13,8 +13,30 @@ import { ConfigService } from '@nestjs/config';
 import { CONFIG_SCHEMA_TYPE } from '../config-module';
 import { UnitOfWorkSequelize } from '@core/shared/infra/db/sequelize/unit-of-work-sequelize';
 import { Sequelize } from 'sequelize';
+import { GenreModel } from '@core/genre/infra/db/sequelize/genre.model';
+import { GenreCategoryModel } from '@core/genre/infra/db/sequelize/genre-category.model';
+import { CastMemberModel } from '@core/cast-member/infra/db/sequelize';
+import {
+  AudioVideoMediaModel,
+  ImageMediaModel,
+  VideoCastMemberModel,
+  VideoCategoryModel,
+  VideoGenreModel,
+  VideoModel,
+} from '@core/video/infra/db/sequelize';
 
-const models = [CategoryModel];
+const models = [
+  CategoryModel,
+  GenreModel,
+  GenreCategoryModel,
+  CastMemberModel,
+  VideoModel,
+  VideoCategoryModel,
+  VideoCastMemberModel,
+  VideoGenreModel,
+  ImageMediaModel,
+  AudioVideoMediaModel,
+];
 
 @Global()
 @Module({

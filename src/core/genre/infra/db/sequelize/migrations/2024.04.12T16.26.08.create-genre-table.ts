@@ -44,6 +44,6 @@ export const up: MigrationFn<Sequelize> = async ({ context: sequelize }) => {
 };
 
 export const down: MigrationFn<Sequelize> = async ({ context: sequelize }) => {
-  await sequelize.getQueryInterface().dropTable('genres');
   await sequelize.getQueryInterface().dropTable('category_genre');
+  await sequelize.getQueryInterface().dropTable('genres');
 };

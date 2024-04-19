@@ -141,7 +141,7 @@ export const USE_CASES = {
       CAST_MEMBERS_PROVIDERS.REPOSITORIES.CAST_MEMBER_REPOSITORY.provide,
     ],
   },
-  COMPLETE_PROCESS_AUDIO_VIDEO_MEDIA_USE_CASE: {
+  PROCESS_AUDIO_VIDEO_MEDIA_USE_CASE: {
     provide: ProcessAudioVideoMediasUseCase,
     useFactory: (
       uow: IUnitOfWork,
